@@ -1,0 +1,5 @@
+(train_data,train_labels),(test_data,test_labels)=cifar10.load_data()
+train_data,test_data=train_data/255.,test_data/255.
+
+train_dataset=tf.data.Dataset.from_tensor_slices((train_data[:10000],train_labels[:10000])).batch(256)
+test_dataset=tf.data.Dataset.from_tensor_slices((test_data[:10000],test_labels[:10000])).batch(256)
