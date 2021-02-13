@@ -14,7 +14,7 @@ def train_step(model,input,label,loss_object,optimizer,train_loss,train_acc):
   gradient=tape.gradient(loss,model.trainable_variables)
   optimizer.apply_gradients(zip(gradient,model.trainable_variables))
   train_loss(loss)
-  train_acc(acc)
+  train_acc(label,pre)
 
 def test_step(model,input,label,loss_object,test_loss,test_acc):
   pre=model(input,training=False)
