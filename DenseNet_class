@@ -45,15 +45,14 @@ class DNet(tf.keras.Model):
     self.d1=Dlayer(2,4,(3,3)) # 28 28 16
     self.t1=TransitionLayer(16,(3,3))
 
-    self.d2=Dlayer(2,8,(3,3)) # 28 28 32
+    self.d2=Dlayer(2,8,(3,3)) # 14 14 32
     self.t2=TransitionLayer(32,(3,3))
 
-    self.d1=Dlayer(2,16,(3,3)) # 28 28 64
-    self.t1=TransitionLayer(64,(3,3))
+    self.d3=Dlayer(2,16,(3,3)) # 7 7 64
 
     self.f=Flatten()
-    self.d1=Dense(512,activation="relu")
-    self.d3=Dense(10,activation="softmax")
+    self.de1=Dense(512,activation="relu")
+    self.de3=Dense(10,activation="softmax")
 
   def call(self,x,training=False,mask=None):
     x=self.conv1(x)
@@ -65,8 +64,7 @@ class DNet(tf.keras.Model):
     x=self.t2(x)
 
     x=self.d3(x,training=training)
-    x=self.t3(x)
 
     x=self.f(x)
-    x=self.d1(x)
-    return self.d2(x)
+    x=self.de1(x)
+    return self.de2(x)
