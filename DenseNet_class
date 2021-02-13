@@ -1,0 +1,72 @@
+class Dunit(tf.keras.Model):
+  def __init__(self,growth_rate,kernel_size):
+    super(Dunit,self).__init__()
+
+    self.bn=BatchNormalization()
+    self.conv=Conv2D(growth_rate,kernel_size,padding="SAME")
+    self.concat=tf.keras.layers.Concatenate()
+  def call(self,x,training=False,mask=None):
+    h=self.bn(x,training=training)
+    h=tf.nn.relu(h)
+    h=self.conv(h)
+    return self.concat([x,h])  #Batch,w,h,growh_rate+C_in
+
+class Dlayer(tf.keras.Model):
+  def __init__(self,num_input,growth_rate,kernel_size):
+    super(Dlayer,self).__init__()
+    self.sequence=list()
+
+    for idx in range(num_input):
+      self.sequence.append(Dunit(growth_rate,kernel_size))
+
+  def call(self,x,training=False,mask=None):
+    for unit in self.sequence:
+      x=unit(x,training=training)
+    
+    return x
+
+class TransitionLayer(tf.keras.Model):
+  def __init__(self,filters,kernel_size):
+    super(TransitionLayer,self).__init__()
+    self.conv=Conv2D(filters,kernel_size,padding="SAME")
+    self.pool=MaxPool2D((2,2))
+
+  def call(self,x,training=False,mask=None):
+    x=self.conv(x)
+    x=self.pool(x)
+    return x
+
+class DNet(tf.keras.Model):
+  def __init__(self):
+    super(DNet,self).__init__()
+    
+    self.conv1=Conv2D(8,(3,3),padding="SAMe",activation="relu") # 28 28 8
+
+    self.d1=Dlayer(2,4,(3,3)) # 28 28 16
+    self.t1=TransitionLayer(16,(3,3))
+
+    self.d2=Dlayer(2,8,(3,3)) # 28 28 32
+    self.t2=TransitionLayer(32,(3,3))
+
+    self.d1=Dlayer(2,16,(3,3)) # 28 28 64
+    self.t1=TransitionLayer(64,(3,3))
+
+    self.f=Flatten()
+    self.d1=Dense(512,activation="relu")
+    self.d3=Dense(10,activation="softmax")
+
+  def call(self,x,training=False,mask=None):
+    x=self.conv1(x)
+
+    x=self.d1(x,training=training)
+    x=self.t1(x)
+
+    x=self.d2(x,training=training)
+    x=self.t2(x)
+
+    x=self.d3(x,training=training)
+    x=self.t3(x)
+
+    x=self.f(x)
+    x=self.d1(x)
+    return self.d2(x)
