@@ -1,0 +1,15 @@
+model=DNet()
+for step in range(10):
+  for x,y in iter(train_dataset):
+    train_step(model,x,y,loss_object,optimizer,train_loss,train_acc)
+  for x,y in iter(test_dataset):
+    test_step(model,x,y,loss_object,test_loss,test_acc)
+  print("step: {:}  train_acc: {:.2f}  test_acc:{:.2f}".format(
+      step,
+      train_acc.result()*100,
+      test_acc.result()*100
+  ))
+  train_loss.reset_states()
+  train_acc.reset_states()
+  test_loss.reset_states()
+  test_acc.reset_states()
